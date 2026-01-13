@@ -1,3 +1,7 @@
 # Python Virtuar Environment
 .venv-api-dev
 venv-api-dev
+
+# Python 캐시 디렉토리
+__pycache__/
+*.pyc
