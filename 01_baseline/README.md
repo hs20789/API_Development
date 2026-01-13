@@ -104,6 +104,7 @@ sqlite> .import --skip 1 data/team_player_data.csv team_player
 
 
 터미널에 아래의 명령어를 입력하여 필요한 라이브러리와 모듈들을 설치한다.
+
 `python -m pip install -r requirements.txt`
 
 
@@ -115,4 +116,5 @@ sqlite> .import --skip 1 data/team_player_data.csv team_player
 - test_crud.py: SQLAlchemy 파일을 단위 테스트하기 위한 파이썬 파일
 
 `pytest test_crud.py`
+
 위의 명령어를 터미널에 입력하면 테스트를 할 수 있다.
