@@ -66,7 +66,7 @@ def read_performances(
     return performances
 
 
-@app.get("/v0/leageus/{league_id}", response_model=schemas.League)
+@app.get("/v0/leagues/{league_id}/", response_model=schemas.League)
 def read_league(league_id: int, db: Session = Depends(get_db)):
     league = crud.get_league(db, league_id=league_id)
     if league is None:

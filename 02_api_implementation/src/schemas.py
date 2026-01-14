@@ -18,13 +18,13 @@ class PlayerBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     player_id: int
     gsis_id: str
-    frist_name: str
+    first_name: str
     last_name: str
     position: str
     last_changed_date: date
 
 
-class Player(BaseModel):
+class Player(PlayerBase):
     model_config = ConfigDict(from_attributes=True)
     performances: List[Performance] = []
 
