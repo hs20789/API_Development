@@ -64,3 +64,24 @@ ASGI 명세에 따라 설계되어 FastAPI 애플리케이션을 고성능으로
 `python -m pip install -r requirements.txt`
 
 
+터미널에 아래의 명령어 입력
+
+`pytest test_main.py`
+
+
+```
+(venv-api-dev) PS C:\Users\{your_name}\API_Devlopment\02_api_implementation\src> pytest .\test_main.py
+=============================================================== test session starts ================================================================
+platform win32 -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\HeonSu\personal\python\HandsON\API_Devlopment\02_api_implementation\src
+plugins: anyio-4.12.1
+collected 11 items                                                                                                                                  
+
+test_main.py ...........                                                                                                                      [100%]
+
+================================================================ 11 passed in 1.79s ================================================================ 
+(venv-api-dev) PS C:\Users\{your_name}\API_Devlopment\02_api_implementation\src> 
+```
+
+
+위와 같은 결과가 나온다면 테스트 통과
