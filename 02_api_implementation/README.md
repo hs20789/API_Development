@@ -59,7 +59,7 @@ ASGI 명세에 따라 설계되어 FastAPI 애플리케이션을 고성능으로
 
 ## 실행 흐름
 
-다음 명령어를 실행해 새로운 라이브러리를 설치
+다음 명령어를 실행해 필요한 라이브러리를 설치
 
 `python -m pip install -r requirements.txt`
 
