@@ -85,3 +85,111 @@ test_main.py ...........                                                        
 
 
 위와 같은 결과가 나온다면 테스트 통과
+
+
+---
+
+# API 테스트
+
+`fastapi run main.py --port {사용할 포트 번호}`
+
+위의 명령어를 입력하면 내부적으로 uvicorn을 실행해 서버를 생성한다.
+- FastAPI: **요청을 어떻게 처리할지** 정의하는 프레임워크
+- Uvicorn: **네트워크 포트 열고 HTTP 요청을 받는** 서버
+
+성공시 터미널은 아래와 같은 형식이 나온다.
+
+```
+(venv-api-dev) PS C:\Users\HeonSu\personal\python\HandsON\API_Devlopment\02_api_implementation\src> fastapi run main.py --port 8080 
+
+   FastAPI   Starting production server 🚀
+ 
+             Searching for package file structure from directories with __init__.py files
+             Importing from C:\Users\HeonSu\personal\python\HandsON\API_Devlopment\02_api_implementation\src
+ 
+    module   🐍 main.py
+ 
+      code   Importing the FastAPI app object from the module with the following code:
+ 
+             from main import app
+ 
+       app   Using import string: main:app
+ 
+    server   Server started at http://0.0.0.0:8080
+    server   Documentation at http://0.0.0.0:8080/docs
+ 
+             Logs:
+ 
+      INFO   Started server process [2304]
+      INFO   Waiting for application startup.
+      INFO   Application startup complete.
+      INFO   Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+```
+
+위의 출력 결과가 나왔다면 브라우저에
+
+`localhost:{사용한 포트 번호}`
+
+을 입력한다. 성공 시
+
+`{"message":"API 상태 확인 성공"}`
+
+위와 같은 메시지가 나온다.
+
+다음 단계로 데이터를 조회하는 API 엔드포인트를 테스트해보자. 브라우저의 기본 URL 뒤에 원하는 쿼리를 입력한다.
+
+`localhost:{사용한 포트 번호}/v0/performances/?limit=5`
+
+결과는 아래와 같다.
+
+```
+[
+  {
+    "performance_id": 2501,
+    "player_id": 1001,
+    "week_number": "202301",
+    "fantasy_points": 20,
+    "last_changed_date": "2024-03-01"
+  },
+  {
+    "performance_id": 2502,
+    "player_id": 1002,
+    "week_number": "202301",
+    "fantasy_points": 22,
+    "last_changed_date": "2024-03-01"
+  },
+  {
+    "performance_id": 2503,
+    "player_id": 1003,
+    "week_number": "202301",
+    "fantasy_points": 13,
+    "last_changed_date": "2024-03-01"
+  },
+  {
+    "performance_id": 2504,
+    "player_id": 1004,
+    "week_number": "202301",
+    "fantasy_points": 15,
+    "last_changed_date": "2024-03-01"
+  },
+  {
+    "performance_id": 2505,
+    "player_id": 1005,
+    "week_number": "202301",
+    "fantasy_points": 3,
+    "last_changed_date": "2024-03-01"
+  }
+]
+```
+
+---
+
+요약
+
+= FastAPI, SQLAlchemy, Pydantic, Uvicorn을 비롯한 여러 라이브러리를 설치했다.
+
+- API 사용자가 원하는 데이터를 구조화해 전달할 수 있도록 Pydantic 스키마를 정의했다.
+
+- 클라이언트 요청을 처리하고 응답을 반환하는 FastAPI 프로그램을 작성해 전체 구성 요소를 하나의 시스템으로 통합했다.
+
+- pytest를 사용해 API 기능을 검증하고, 실제 웹 서버에서 실행해 성공적으로 동작하는지 확인했다.
