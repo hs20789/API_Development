@@ -7,8 +7,29 @@ from datetime import date
 import crud, schemas
 from database import SessionLocal
 
+api_description = """
+이 API는 SportWorldCentral(SWC) 판타지 풋볼 API의 정보를 읽기 전용으로 제공한다.
+제공되는 엔드포인트는 아래와 같다.
+
+## 분석(analytics)
+API의 상태 및 리그, 팀, 선수 수에 대한 정보를 제공한다.
+
+## 선수(players)
+NFL 선수 목록을 조회하거나, 특정 player_id를 이용해 개별 선수 정보를 제공한다.
+
+## 점수(scoring)
+NFL 선수의 경기 성적과 해당 성적을 기반으로 한 SWC 리그 판타지 점수를 제공한다.
+
+## 멤버심(membership)
+SWC 판타지 풋볼 리그 전체와 각 리그에 속한 팀에 대한 정보를 제공한다.
+"""
+
 # 객체 생성
-app = FastAPI()
+app = FastAPI(
+    description=api_description,
+    title="Sports World Central(SWC) Fantasy Football API",
+    version="0.1",
+)
 
 
 # 종속성
