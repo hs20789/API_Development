@@ -24,7 +24,7 @@ NFL 선수의 경기 성적과 해당 성적을 기반으로 한 SWC 리그 판�
 SWC 판타지 풋볼 리그 전체와 각 리그에 속한 팀에 대한 정보를 제공한다.
 """
 
-# 객체 생성
+# OpenAPI 명세에 추가 세부 정보가 추가된 FastAPI 생성자
 app = FastAPI(
     description=api_description,
     title="Sports World Central(SWC) Fantasy Football API",
@@ -41,12 +41,12 @@ def get_db():
         db.close()
 
 
-@app.get("/")
+@app.get("/", tags=["analytics"])
 async def root():
     return {"message": "API 상태 확인 성공"}
 
 
-@app.get("/v0/players/", response_model=list[schemas.Player])
+@app.get("/v0/players/", response_model=list[schemas.Player], tags=["player"])
 def read_players(
     skip: int = 0,
     limit: int = 100,
@@ -66,7 +66,7 @@ def read_players(
     return players
 
 
-@app.get("/v0/players/{player_id}", response_model=schemas.Player)
+@app.get("/v0/players/{player_id}", response_model=schemas.Player, tags=["player"])
 def get_read_player(player_id: int, db: Session = Depends(get_db)):
     player = crud.get_player(db, player_id=player_id)
     if player is None:
@@ -74,7 +74,9 @@ def get_read_player(player_id: int, db: Session = Depends(get_db)):
     return player
 
 
-@app.get("/v0/performances/", response_model=list[schemas.Performance])
+@app.get(
+    "/v0/performances/", response_model=list[schemas.Performance], tags=["scoring"]
+)
 def read_performances(
     skip: int = 0,
     limit: int = 100,
@@ -87,7 +89,7 @@ def read_performances(
     return performances
 
 
-@app.get("/v0/leagues/{league_id}/", response_model=schemas.League)
+@app.get("/v0/leagues/{league_id}/", response_model=schemas.League, tags=["membership"])
 def read_league(league_id: int, db: Session = Depends(get_db)):
     league = crud.get_league(db, league_id=league_id)
     if league is None:
@@ -95,7 +97,7 @@ def read_league(league_id: int, db: Session = Depends(get_db)):
     return league
 
 
-@app.get("/v0/leagues/", response_model=list[schemas.League])
+@app.get("/v0/leagues/", response_model=list[schemas.League], tags=["membership"])
 def read_leagues(
     skip: int = 0,
     limit: int = 100,
@@ -113,7 +115,7 @@ def read_leagues(
     return leagues
 
 
-@app.get("/v0/teams/", response_model=list[schemas.Team])
+@app.get("/v0/teams/", response_model=list[schemas.Team], tags=["membership"])
 def read_teams(
     skip: int = 0,
     limit: int = 0,
@@ -133,7 +135,7 @@ def read_teams(
     return teams
 
 
-@app.get("/v0/counts/", response_model=schemas.Counts)
+@app.get("/v0/counts/", response_model=schemas.Counts, tags=["analytics"])
 def get_count(db: Session = Depends(get_db)):
     counts = schemas.Counts(
         league_count=crud.get_league_count(db),
