@@ -100,12 +100,12 @@ test_main.py ...........                                                        
 성공시 터미널은 아래와 같은 형식이 나온다.
 
 ```
-(venv-api-dev) PS C:\Users\HeonSu\personal\python\HandsON\API_Devlopment\02_api_implementation\src> fastapi run main.py --port 8080 
+(venv-api-dev) PS C:\{경로}\python\HandsON\API_Devlopment\02_api_implementation\src> fastapi run main.py --port 8080 
 
    FastAPI   Starting production server 🚀
  
              Searching for package file structure from directories with __init__.py files
-             Importing from C:\Users\HeonSu\personal\python\HandsON\API_Devlopment\02_api_implementation\src
+             Importing from C:\{경로}\python\HandsON\API_Devlopment\02_api_implementation\src
  
     module   🐍 main.py
  
