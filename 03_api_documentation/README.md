@@ -451,3 +451,38 @@ main.py에 정의된 `/v0/players/{player_id}}` 엔드포인트에 대한
 생성형 AI가 API를 더 쉽게 이해하고 활용할 수 있도록 API 호출에 사용되는 쿼리 매개 변수에 설명을 추가하는 것이 권장된다.
 이를 위해 각 매개 변수의 기본값을 Query() 함수와 함꼐 정의하고, 해당 매개 변수가 어떤 역할을 하는지 명확하게 기술해야 한다.
 
+예를 들어 앞에서 데코레이터를 수정했던 read_players 함수는 아래와 같이 개선할 수 있다.
+
+```
+def read_players(
+    skip: int = Query(
+        0, description="API 호출 결과의 시작 부분에서 건너뛸(스킵할) 레코드 수입니다."
+    ),
+    limit: int = Query(
+        100, description="스킵 이후 반환할 최대 레코드 수입니다."
+    ),
+    minimum_last_changed_date: date = Query(
+        None,
+        description="이 날짜 이전에 변경된 레코드는 제외하고, 해당 날짜 이후(포함)에 변경된 레코드만 반환합니다.",
+    ),
+    first_name: str = Query(
+        None, description="조회할 선수의 이름(First name) 필터입니다."
+    ),
+    last_name: str = Query(
+        None, description="조회할 선수의 성(Last name) 필터입니다."
+    ),
+    db: Session = Depends(get_db),
+):
+```
+
+이와 같이 각 매개변수에 설명을 추가해 문서를 더 친절하게 만들면, AI 모델이나 개발자들이 API의 동작을 보다 정확히 이해할 수 있다.
+
+나머지 다른 모든 API 엔드포인트에서도 동일한 방식으로 쿼리 매개 변수에 설명을 추가하자.
+
+적용된 결과는 아래와 같다.
+
+![alt text](img/i7.png)
+
+![alt text](img/i8.png)
+
+---

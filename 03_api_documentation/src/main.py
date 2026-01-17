@@ -1,6 +1,6 @@
 """FastAPI 컨트롤러"""
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -68,11 +68,18 @@ async def root():
     tags=["players"],
 )
 def read_players(
-    skip: int = 0,
-    limit: int = 100,
-    minimum_last_changed_date: date = None,
-    first_name: str = None,
-    last_name: str = None,
+    skip: int = Query(
+        0, description="API 호출 결과의 시작 부분에서 건너뛸(스킵할) 레코드 수입니다."
+    ),
+    limit: int = Query(100, description="스킵 이후 반환할 최대 레코드 수입니다."),
+    minimum_last_changed_date: date = Query(
+        None,
+        description="이 날짜 이전에 변경된 레코드는 제외하고, 해당 날짜 이후(포함)에 변경된 레코드만 반환합니다.",
+    ),
+    first_name: str = Query(
+        None, description="조회할 선수의 이름(First name) 필터입니다."
+    ),
+    last_name: str = Query(None, description="조회할 선수의 성(Last name) 필터입니다."),
     db: Session = Depends(get_db),
 ):
     players = crud.get_players(
@@ -118,9 +125,14 @@ def get_read_player(player_id: int, db: Session = Depends(get_db)):
     tags=["scoring"],
 )
 def read_performances(
-    skip: int = 0,
-    limit: int = 100,
-    minimum_last_changed_date: date = None,
+    skip: int = Query(
+        0, description="API 호출 결과의 시작 부분에서 건너뛸(스킵할) 레코드 수입니다."
+    ),
+    limit: int = Query(100, description="스킵 이후 반환할 최대 레코드 수입니다."),
+    minimum_last_changed_date: date = Query(
+        None,
+        description="이 날짜 이전에 변경된 레코드는 제외하고, 해당 날짜 이후(포함)에 변경된 레코드만 반환합니다.",
+    ),
     db: Session = Depends(get_db),
 ):
     performances = crud.get_performances(
@@ -160,10 +172,17 @@ def read_league(league_id: int, db: Session = Depends(get_db)):
     tags=["membership"],
 )
 def read_leagues(
-    skip: int = 0,
-    limit: int = 100,
-    minimum_last_changed_date: date = None,
-    league_name: str = None,
+    skip: int = Query(
+        0, description="API 호출 결과의 시작 부분에서 건너뛸(스킵할) 레코드 수입니다."
+    ),
+    limit: int = Query(100, description="스킵 이후 반환할 최대 레코드 수입니다."),
+    minimum_last_changed_date: date = Query(
+        None,
+        description="이 날짜 이전에 변경된 레코드는 제외하고, 해당 날짜 이후(포함)에 변경된 레코드만 반환합니다.",
+    ),
+    league_name: str = Query(
+        None, description="조회할 리그 이름 필터입니다(SWC에서 유일하지 않을 수 있음)."
+    ),
     db: Session = Depends(get_db),
 ):
     leagues = crud.get_leagues(
@@ -192,11 +211,21 @@ def read_leagues(
     tags=["membership"],
 )
 def read_teams(
-    skip: int = 0,
-    limit: int = 0,
-    minimum_last_changed_date: date = None,
-    team_name: str = None,
-    league_id: int = None,
+    skip: int = Query(
+        0, description="API 호출 결과의 시작 부분에서 건너뛸(스킵할) 레코드 수입니다."
+    ),
+    limit: int = Query(100, description="스킵 이후 반환할 최대 레코드 수입니다."),
+    minimum_last_changed_date: date = Query(
+        None,
+        description="이 날짜 이전에 변경된 레코드는 제외하고, 해당 날짜 이후(포함)에 변경된 레코드만 반환합니다.",
+    ),
+    team_name: str = Query(
+        None,
+        description="조회할 팀 이름 필터입니다(SWC 전체에서는 유일하지 않을 수 있으나, 리그 내부에서는 유일할 수 있습니다).",
+    ),
+    league_id: int = Query(
+        None, description="조회할 리그 ID 필터입니다(SWC에서 유일한 식별자)."
+    ),
     db: Session = Depends(get_db),
 ):
     teams = crud.get_teams(
