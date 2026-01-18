@@ -204,5 +204,199 @@
 
 --- 
 
-## Render에 API 배포하기
+## ngrok 배포와 클라우드 배포
 
+ngrok (집으로 친구 초대하기)
+
+ngrok은 로컬(또는 사설망)에서 실행 중인 서버로 트래픽이 들어오도록 공개 엔드포인트를 만들고, 그 트래픽을 ngrok agent가 upstream(내 앱)으로 전달하는 구조이다.
+
+- API는 여전히 내 노트북/PC 또는 사설망 서버에서 실행된다.
+
+- ngrok은 공개 URL(HTTPS 포함)을 만들어서 외부 요청이 들어오게 하고, 그 요청을 내 로컬로 터널로 전달한다.
+
+즉, ngrok은 로컬에서 작동중인 서비스에 다른 사용자가 접속을 가능하게 해주는 것이다.
+
+
+클라우드 배포 (전문 식당에 내 레시피를 전달하기)
+
+클라우드 배포는 API 자체를 클라우드의 실행 환경(IaaS/PaaS/컨테이너/서버리스)에 올려서, 그 환경에서 24/7 운영 가능하게 만드는 것이다.
+
+- 내 API 실행 위치: 클라우드 인프라/관리형 플랫폼
+
+- 확장/복구/관측(로그·메트릭) 등 운영 기능이 클라우드 서비스로 통합된느 경우다 많다.
+
+- 일반적으로 프로덕션 운영(가용성, 확장성, 보안, 비용 관리)에 맞춰 설계한다.
+
+---
+
+## Azure 클라우드를 이용한 API 배포
+
+### 1. 도커 이미지 생성하기
+
+터미널에 아래의 명령어를 입력한다.
+
+`docker build -t apicontainerimage .`
+
+이 명령어는 현재 디렉토리에 있는 도커파일을 참조해 apicontainerimage라는 이름의 이미지를 빌드한다.
+빌드된 이미지는 로컬 도커 저장소에 저장되는데, 처음 실행할 때에는 필요한 베이스 이미지와 의존 패키지를 다운로드하느라 시간이 걸릴 수 있지만 이후부터는 변경되지 않은 항목이 캐시되기에 훨씬 빠르게 빌드된다.
+
+작업이 완료되면 다음과 같은 형식의 실행 결과가 표시된다.
+
+```
+[+] Building 19.1s (11/11) FINISHED                                                                                             docker:desktop-linux 
+ => [internal] load build definition from Dockerfile                                                                                            0.0s 
+ => => transferring dockerfile: 664B                                                                                                            0.0s 
+ => [internal] load metadata for docker.io/library/python:3.12-slim                                                                             1.7s 
+ => [internal] load .dockerignore                                                                                                               0.0s 
+ => => transferring context: 96B                                                                                                                0.0s 
+ => [1/6] FROM docker.io/library/python:3.12-slim@sha256:5e2dbd4bbdd9c0e67412aea9463906f74a22c60f89eb7b5bbb7d45b66a2b68a6                       5.6s 
+ => => resolve docker.io/library/python:3.12-slim@sha256:5e2dbd4bbdd9c0e67412aea9463906f74a22c60f89eb7b5bbb7d45b66a2b68a6                       0.0s 
+ => => sha256:5e2dbd4bbdd9c0e67412aea9463906f74a22c60f89eb7b5bbb7d45b66a2b68a6 10.37kB / 10.37kB                                                0.0s 
+ => => sha256:ef24548e6db34726360ab68d85d8054197c409650aa1796dd2694fcbb1e8d633 1.75kB / 1.75kB                                                  0.0s 
+ => => sha256:c78a70d7588fc2f2a6d4a9777b09c4a1a22beb89586a8de86532be0c8e9eb20f 5.68kB / 5.68kB                                                  0.0s 
+ => => sha256:119d43eec815e5f9a47da3a7d59454581b1e204b0c34db86f171b7ceb3336533 29.77MB / 29.77MB                                                3.7s 
+ => => sha256:83e2eb8c4c73235e21df3ea0ce6aa840fcb84f4cb368fb6b443a8a87d95850d0 1.29MB / 1.29MB                                                  1.2s 
+ => => sha256:671677b67e7671119d142c2f8548882641edfad92863ee1ccff2cd84c3b14a2a 12.11MB / 12.11MB                                                3.0s 
+ => => sha256:3d6ef8a4ce0aaaaa35261feb115464317fcb4910873cba90171f7ad544a9964e 249B / 249B                                                      1.8s 
+ => => extracting sha256:119d43eec815e5f9a47da3a7d59454581b1e204b0c34db86f171b7ceb3336533                                                       0.9s 
+ => => extracting sha256:83e2eb8c4c73235e21df3ea0ce6aa840fcb84f4cb368fb6b443a8a87d95850d0                                                       0.1s 
+ => => extracting sha256:671677b67e7671119d142c2f8548882641edfad92863ee1ccff2cd84c3b14a2a                                                       0.5s 
+ => => extracting sha256:3d6ef8a4ce0aaaaa35261feb115464317fcb4910873cba90171f7ad544a9964e                                                       0.0s 
+ => [internal] load build context                                                                                                               0.1s 
+ => => transferring context: 635.00kB                                                                                                           0.1s 
+ => [2/6] WORKDIR /code                                                                                                                         0.1s 
+ => [3/6] COPY src/requirements.txt /code/                                                                                                      0.1s 
+ => [4/6] RUN pip3 install --no-cache-dir --upgrade -r requirements.txt                                                                        11.1s 
+ => [5/6] COPY src/*.py /code/                                                                                                                  0.1s 
+ => [6/6] COPY src/*.db /code/                                                                                                                  0.1s 
+ => exporting to image                                                                                                                          0.6s 
+ => => exporting layers                                                                                                                         0.6s 
+ => => writing image sha256:ebbc965aefa2201b5a9a65602417f8ce481f8913c157dbec2c195951024e440c                                                    0.0s
+ => => naming to docker.io/library/apicontainerimage                                                                                            0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/mngw3r42vlo6w62zsgypjb7yt
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview 
+```
+
+위의 결과가 나왔다면 이미지는 성공적으로 생성된 것이다. 
+이미지 생성 성공 여부를 터미널에서 확인하고 싶다면
+
+
+`docker images | findstr apicontainerimage`
+
+해당 명령어를 입력하고 아래의 출력결과가 있다면 성공적으로 생성된 것임을 확인할 수 있다.
+
+`apicontainerimage         latest    ebbc965aefa2   4 minutes ago   222MB`
+
+
+### 2. 로컬에서 컨테이너 이미지 실행하기
+
+앞에서 생성한 도커 이미지를 기반으로 컨테이너를 실행하려면 다음과 같은 명령어를 입력한다.
+
+`docker run --publish 80:80 --name apicontainer1 apicontainerimage`
+
+명령어를 실행하면 아래와 같은 메세지가 출력된다.
+
+```
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+```
+
+이제 브라우저에서 `localhost`에 접속하면 성공적으로 API가 활성화 됐음을 확인할 수 있다.
+여기까지 되었다면, API가 도커 컨테이너에서 정상적으로 실행되고 있는 것이다. 실행을 중지하려면 `Ctrl + C`를 누른다.
+
+
+### 3. Azure Container Registry에 로컬의 컨테이너 올리기
+
+Azure에서 컨테이너 기반으로 클라우드상에서 API를 실행시키려면 먼져 **"이미지 아티팩트**가 Azure에서 접근 가능해야 한다.
+
+Azure App Service나 Azure Container Apps, Azure Virtual Machine 같은 클라우드 호스트는 기본적으로 내 로컬 PC 디스크에 있는 이미지에 접근하지 않는다. 
+클라우드 호스트는 레지스트리(대표적으로 Azure Container Registries, ACR)에서 이미지를 가져오는 구조이다. 그래서 보통 컨테이너 기반으로 클라우드를 활용하여 배포할 때의 첫 단계는 이미지를 ACR에 푸시하는 것이다.
+
+- 먼져 Azure에 로그인하고 **Container registries** 카테고리로 들어가고 **create**를 누른다.
+
+- **Resource Group**과 **Registry name**을 입력하고 **Review + create**를 누르고 검증이 끝나면 **create**를 누른다.
+
+이제 컨테이너의 이미지가 들어갈 창고 하나가 만들어진거고, 이미지는 아직 올라가지 않은 상태이다.
+여기까지 했다면 `az cli` 를 활용하여 로컬의 컨테이너 이미지를 `Azure Container registries`에 올려야한다.
+
+- 터미널에 `az login`을 하여 로그인을 한다. 그 다음 `az acr list --output table` 를 입력하여 위에서 만든 저장소가 정상적으로 만들어졌는지 확인한다.
+
+- 터미널에 `az acr login --name {생성한 ACR 저장소 이름}`을 입력하여 Docker에 이전 단계에서 생성한 ACR 저장소에 접근해도 된다는 인증 자격을 준다.
+
+- Azure에 올릴 컨테이너 이미지에 태그를 달아야 하므로 `docker tag {생성한 ACR 저장소 이름}:latest {생성한 ACR 저장소 이름}.azurecr.io/{컨테이너 이름}:latest`
+> Docker는 태그 없이는 목적지와 버전을 구분할 수 없기에 태그를 달아야 한다.
+
+- 이제 `docker push hsapicontainer1.azurecr.io/apicontainerimage:latest` 명령어를 입력하여 ACR에 컨테이너 이미지를 push한다.
+
+push에 성공하였다면 아래와 같은 결과가 나온다.
+
+
+```
+The push refers to repository [hsapicontainer1.azurecr.io/apicontainerimage]
+56c3336211c0: Pushed 
+c830f4211b5d: Pushed
+aedb57ed0096: Pushed
+ab2e5da72dd0: Pushed
+91c94f28f012: Pushed
+343fbb74dfa7: Pushed
+cfdc6d123592: Pushed
+ff565e4de379: Pushed
+e50a58335e13: Pushed
+latest: digest: sha256:17bac3ff08b8f2d4ece4c0c245e1a34ec10ebdc98505483935cdcc11242a3835 size: 2202
+```
+
+- 터미널에 `az acr repository list --name {생성한 ACR 저장소 이름} --output table`을 입력하였을 때
+
+```
+Result
+-----------------
+{컨테이너 이미지 이름}
+```
+
+- 혹은 터미널에 `docker pull {생성한 ACR 저장소 이름}.azurecr.io/{컨테이너 이미지 이름}:latest`
+
+위의 결과가 나오면 ACR에 정상적으로 올라갔음을 알 수 있다.
+
+### 4. API 배포하기
+
+이미지가 준비되면, 그 다음이 진짜 의미의 클라우드 호스트 선택(실행 환경 선택)이다.
+
+여기서 후보는 대표적으로 
+
+- App Service(Custom Container): PaaS 성격, 빠르고 단순
+- Container Apps: 서버리스 컨테이너, 컨테이너 운영 루프에 더 자연스러움
+- Container Instance(ACI): 매우 단순한 단일 컨테이너 실행(주로 배치/테스트/일회성)
+- VM: 가장 낮은 추상화(직접 운영), 학습·통제는 크지만 부담도 큼
+- AKS: 쿠버네티스(규모/복잡도 있을 때)
+
+여기서는 **App Services**로 API를 배포한다.
+
+`App Services` 접속하여 **리소스 그룹**과 **Web App Name**을 적당한 입력하고, **Publish**항목을 반드시 **Container**로 바꿔준다.
+
+- 작성을 완료하였다면 스크롤을 아래로 내려서 **Review + create**를 누른다.
+
+- 검증이 끝났다면 이제 **create**를 누른다.
+
+- 생성이 완료되었다면 **Go to resource**를 누른다.
+
+- 왼쪽의 작업 테이블에서 **Deployment** -> **Deployment Center**를 선택
+
+- **name** 카테고리의 **main** 선택
+> 이는 main이라는 임시 컨테이너를 다른 이미지로 교체하는 것이다.
+
+- **Image Source**를 **Azure Contaier Registry**로 교체하고 **Registry**를 이전 단계에서 생성한 저장소 이름으로 변경한다.
+
+- 그 다음 Image이름과 태그를 작성하고 포트를 8000으로 바꾸고 **Apply**를 누른다.
+
+- 이후, 이전 단계에서 생성한 ACR로 가서, **Add role assignment**항목으로 간 후 **AcrPull**을 누르고 **Next**를 누른다.
+
+- **Managed identity**를 누르고 **Select members**를 눌러서 이전에 생성한 App Service 호스트를 선택한다.
+
+- 이제 도메인을 가지고 접속하면 된다.
+
+해당 도메인으로 웹 상에서 접속이 되었다면 Azure 클라우드를 사용하여 API 배포를 성공한 것이다.
