@@ -1138,3 +1138,39 @@ my-sdk/                     # 프로젝트 루트
 ---
 
 ## SDK 만들기 실습
+
+`05_api_as_product/sdk/` 경로에서 `python -m pip install -e .` 실행
+
+성공시 마지막 출력이 다음과 같아진다:
+
+```
+  Created wheel for swcpy: filename=swcpy-0.0.1-0.editable-py3-none-any.whl size=1430 sha256=c037c1628825f485c63b68f3ccce574b4155fbcdba30d7676de452bc7fa585df
+  Stored in directory: C:\Users\HeonSu\AppData\Local\Temp\pip-ephem-wheel-cache-j88q1grd\wheels\71\1a\5e\cefcfeba98ecacb594a62db1dec31cec930d4afbcf312ae297
+Successfully built swcpy
+Installing collected packages: swcpy
+Successfully installed swcpy-0.0.1
+```
+
+이 설치 과정에서 pip은 `pyproject.toml`에 정의된 버전 정보에 맞춰 패키지를 설치한다.
+
+이제 현재 파이썬 가상환경(`venv`)의 관점에서 `swcpy`는 설치된 패키지로 인식된다.
+다만, 소스코드를 site-package로 복사하지 않고, 현재 프로젝트 경로를 import 경로로 연결한다.
+> 참고로, 보통의 경우 `pip install`로 패키지를 설치할 때 `site-package`에 저장되는 소스코드들은 해당 패키지가 런타임에 필요한 코드들이다.
+
+즉, 설치한 `venv`에 연결 정보가 생겨서(`site-package` 어딘가에 경로 등록용 파일이 생성된다) 파이썬이 실행될 때, 해당 `venv`는 그 연결 정보를 읽고 `src/`를 import 가능하게 만든다.
+
+이때, 그냥 폴더를 경로에 추가하는 수준이 아니라, 해당 폴더를 설치된 패키지(distribution)로 등록해야 하는데, 이러기 위해서는 패키지의 신원/버전/의존성/구성 정보를 표준 형식으로 저장해야 한다. 이 저장물이 `*.egg-info`(또는 `*.dist-info`)이다.
+따라서, `python -m pip install -e .` 명령어를 실행하고 나면 `sdk/` 에 `swcpy.egg-info` 라는 폴더가 생성된다.
+> 파이썬은 `sys.path`에만 들어오면 `import`가 되지만, pip은 패키지 관리자이기에 패키지의 이름, 버전, 의존성 등등을 관리해야하기 떄문이다.
+
+이 메타데이터가 담겨진 폴더가 있어서 다음이 가능해진다.
+
+- `pip show swcpy`
+- `pip uninstall swcpy`로 연결/등록 정보 제거
+- `pip check`로 의존성 충돌 검사
+- 빌드/배포 시 패키지 구성 추적
+- 테스트/CI에서 설치 상태 재현 가능
+
+`pip uninstall swcpy` 를 실행하면, `venv`의 `site-package`에 존재하는 editable 연결(경로 등록) 정보를 제거하여 `import swcpy`가 더 이상 프로젝트 경로를 통해 되지 않는다.
+
+다만, 프로젝트 폴더 자체는 건드리지 않으므로 `src/swcpy/`와 `src/swcpy.egg-info`는 그대로 남는다.
