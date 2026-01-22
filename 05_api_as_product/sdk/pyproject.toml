@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # 패키지의 이름, 버전, 설명, 개발자 등 기본 메타데이터를 설정한다.
 [project]
 name = "swcpy"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     { name="[HeonSu]" },
 ]
@@ -21,4 +21,7 @@ classifiers = [
 dependencies = [
     'pytest>=8.1',
     'httpx>=0.27.0',
+    'pydantic>=2.4.0',
+    'backoff>=2.2.1',
+    'pyarrow>=16.0',
 ]
