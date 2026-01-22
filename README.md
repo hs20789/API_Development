@@ -1,10 +1,4 @@
-﻿### 가상환경 생성
+﻿## 소프트웨어 개발 키트 (SDK)
 
-```
-# venv-api-dev 라는 이름의 가상환경 생성
-python -m venv venv-api-dev
-# 현재 셸에서ㅡ가상환경 활성화
-./venv-api-dev/Scripts/Activate.ps1
-# pip 최신 버전으로 업그레이드
-python.exe -m pip install --U pip
-```
+파이썬 사용자라면 swcpy SDK를 사용해 API와 상호작용할 수 있다.
+자세한 정보는 [여기](sdk/README.md)에서 확인할 수 있다.

@@ -1,0 +1,25 @@
+# 파이썬 코드로 데이터베이스를 다루기 위한 ORM + SQL 툴킷
+SQLAlchemy>=2.0.0
+
+# 테스트 프레임 워크
+Pytest>=8.1.0
+
+# 데이터 검증 및 직렬화를 위한 모델링 라이브러리
+# - 요청(Request) / 응답(Response) 데이터 스키마 정의
+# - 타입 힌트 기반 자동 검증 및 변환
+pydantic>=2.4.0
+
+# 고성능 비동기 웹 프레임워크
+# - REST API 및 백엔드 서비스 구현
+# - Pydantic, Starlette 기반
+fastapi[standard]>=0.115.0
+
+# ASGI 서버
+# - FastAPI 애플리케이션 실행
+# - 비동기 이벤트 루프 기반 고성능 서버
+uvicorn>=0.23.0
+
+# HTTP 클라이언트 라이브러리
+# - 외부 API 호출
+# - 테스트 코드에서 FastAPI 엔드포인트 검증용으로 활용
+httpx>=0.27.0
