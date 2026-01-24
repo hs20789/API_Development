@@ -26,6 +26,7 @@ __pycache__/
 # ================================
 # 패키지 빌드 결과물 (wheel, sdist 등)
 build/
+dist
 
 # pip install / editable install 시 생성되는 패키지 메타데이터
 *.egg-info
